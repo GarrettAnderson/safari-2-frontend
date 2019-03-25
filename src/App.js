@@ -21,6 +21,17 @@ class App extends Component {
   handleSearchChange = (event) => {
     const name = event.target.value
     console.log(name)
+    this.setState({ name: name }, () => {
+      axios
+        .put(`http://localhost:3000/animals?name=${this.state.name}`)
+        .then((response) => response.json())
+        .then((response) => {
+          console.log(response)
+          this.setState({
+            animals: response.data
+          })
+        })
+    })
     // axios.get('http://localhost:3000/animals').then((response) => response.json()).then((response) => {
     //   console.log(response)
     //   this.setState({ animals: response })
@@ -41,9 +52,9 @@ class App extends Component {
             return (
               <li key={animal.id}>
                 <p>
-                  A total of {animal.count} {animal.species} was seen!
+                  A total of {animal.seen_count} {animal.species}s were seen!
                 </p>
-                <p>Location: {animal.last_seen_location}</p>
+                <p>Location Last Seen: {animal.last_seen_location}</p>
               </li>
             )
           })}
