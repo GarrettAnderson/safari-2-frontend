@@ -10,10 +10,10 @@ class App extends Component {
   }
 
   componentDidMount() {
-    axios.get('http://localhost:3000/animals').then((response) => response.json()).then((response) => {
+    axios.get('http://localhost:3000/animals').then((response) => {
       console.log(response)
       this.setState({
-        animals: response
+        animals: response.data
       })
     })
   }
