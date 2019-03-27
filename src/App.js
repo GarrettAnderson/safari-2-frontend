@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import Form from 'react-jsonschema-form'
 import axios from 'axios'
-import HelloWorld from './components/HelloWorld'
+import AnimalListing from './components/AnimalListing'
+// import AnimalListing from './components/AnimalListing'
+// import HelloWorld from './components/HelloWorld'
 
 class App extends Component {
   state = {
@@ -10,21 +12,43 @@ class App extends Component {
   }
 
   componentDidMount() {
+    this.showAllAnimals()
+  }
+
+  showAllAnimals = () => {
     axios.get('http://localhost:3000/animals').then((response) => {
-      console.log(response)
+      console.log(response.data)
       this.setState({
         animals: response.data
       })
     })
   }
 
+  incrementSeenCount = () => {
+    console.log(this.state.animals)
+    let allAnimalsListed = this.state.animals
+    // create empty variable to store the seen_counts for all the animals
+    let individualAnimalSeenCount = []
+    let allAnimalSeenSum = 0
+    for (let i = 0; i < allAnimalsListed.length; i++) {
+      console.log(allAnimalsListed[i].seen_count)
+      allAnimalSeenSum += allAnimalsListed[i].seen_count
+      console.log(allAnimalSeenSum)
+      // individualAnimalSeenCount.push(allAnimalsListed[i].seen_count)
+      // console.log(individualAnimalSeenCount)
+      // push each seen count value into new array
+      // call the sum method on the seen count array
+    }
+    return allAnimalSeenSum
+  }
+
   handleSearchChange = (event) => {
-    const name = event.target.value
-    console.log(name)
-    this.setState({ name: name }, () => {
+    const location = event.target.value
+    console.log(location)
+    this.setState({ name: location }, () => {
       axios
-        .put(`http://localhost:3000/animals?name=${this.state.name}`)
-        .then((response) => response.json())
+        .get(`http://localhost:3000/animals?location=${this.state.name}`)
+        // .then((response) => response.json())
         .then((response) => {
           console.log(response)
           this.setState({
@@ -33,11 +57,7 @@ class App extends Component {
         })
     })
   }
-  // axios.get('http://localhost:3000/animals').then((response) => response.json()).then((response) => {
-  //   console.log(response)
-  //   this.setState({ animals: response })
-  // })
-  // }
+
   submit = (form) => {
     console.log(form)
   }
@@ -45,22 +65,31 @@ class App extends Component {
   render() {
     return (
       <section>
-        <p>Search:</p>
+        <h1>Search:</h1>
         <input value={this.state.name} onChange={this.handleSearchChange} />
         <ul>
           <h3>Animals Seen So Far:</h3>
           {this.state.animals.map((animal) => {
+            // return <AnimalListing id={animals.id} />
             return (
-              <li key={animal.id}>
-                <p>
-                  A total of {animal.seen_count} {animal.species}s were seen!
-                </p>
-                <p>Location Last Seen: {animal.last_seen_location}</p>
-              </li>
+              <AnimalListing
+                key={animal.id}
+                id={animal.id}
+                seenAmount={animal.seen_count}
+                species={animal.species}
+                locationSeen={animal.last_seen_location}
+                showAnimalList={this.showAllAnimals}
+              />
             )
           })}
-          {/* <button></button> */}
         </ul>
+        <section>
+          <h1>Total Animals Seen: {this.incrementSeenCount()}</h1>
+          {/* <p>{animal.seen_count}</p> */}
+          {/* can create a function  */}
+          {/* if using API to get data, must add to state with an axios call. state {animals: [], total:}*/}
+          {/* then get the data by using this.state.total */}
+        </section>
       </section>
     )
   }
